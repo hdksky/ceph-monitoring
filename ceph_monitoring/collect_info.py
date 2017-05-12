@@ -64,6 +64,10 @@ def check_output_ssh(host, opts, cmd, no_retry=False, max_retry=3):
 
         if ok or max_retry <= 0:
             return ok, res
+	
+        print "RES: "+res
+	if "command not found" in res:
+	    return False, res
 
         max_retry -= 1
         time.sleep(1)
