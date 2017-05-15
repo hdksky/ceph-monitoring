@@ -65,7 +65,6 @@ def check_output_ssh(host, opts, cmd, no_retry=False, max_retry=3):
         if ok or max_retry <= 0:
             return ok, res
 	
-        print "RES: "+res
 	if "command not found" in res:
 	    return False, res
 
@@ -122,7 +121,10 @@ class Collector(object):
                 return
         ok, out = check_output_ssh(host, self.opts, cmd)
         if not ok:
-            logger.warning("Cmd {0} failed on node {1}".format(cmd, host))
+	    if "command not found" in out:
+                logger.warning("Cmd {0} not found on node {1}".format(cmd, host))
+	    else:
+                logger.warning("Cmd {0} failed on node {1}".format(cmd, host))
         self.emit(path, format, ok, out, check=False)
 
     def emit(self, path, format, ok, out, check=True):
@@ -363,7 +365,6 @@ class NodeCollector(Collector):
                         speed = line.split(":")[1].strip()
                     if 'Duplex:' in line:
                         interface['duplex'] = line.split(":")[1].strip() == 'Full'
-            print "HOST: "+host+" DEV: "+dev+" SPEED: "+speed
 
             ok, data = check_output_ssh(host, self.opts, "iwconfig " + dev)
             if ok and 'Bit Rate=' in data:
