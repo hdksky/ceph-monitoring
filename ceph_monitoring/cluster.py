@@ -146,7 +146,9 @@ def load_performance_log_file(str_data, fields, skip=0, field_types=None):
     lines = iter(str_data.split("\n"))
 
     # Mon Sep  7 21:08:26 UTC 2015
-    sdate = datetime.datetime.strptime(next(lines), "%a %b %d %H:%M:%S UTC %Y")
+    # Strip timezone info from string, as strptime can not deal with timezones in 2.7 and remove UTC marker in sstr pattern
+    sstr = re.sub('[A-Z][A-Z]* ','',next(lines))
+    sdate = datetime.datetime.strptime(sstr, "%a %b %d %H:%M:%S %Y")
     timestamp = (sdate - datetime.datetime(1970, 1, 1)).total_seconds()
 
     per_dev = {}
